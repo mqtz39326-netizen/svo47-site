@@ -32,6 +32,7 @@ import {
   GK47_SOURCE,
   GK47_STAGES,
 } from '@/data/gk47'
+import { pub } from '@/lib/utils'
 
 export default function HeroesTeam() {
   return (
@@ -74,7 +75,7 @@ export default function HeroesTeam() {
       <section className="mx-auto max-w-6xl px-4 pt-12">
         <div className="grid items-center gap-6 rounded-xl border bg-white p-6 shadow-sm sm:p-8 md:grid-cols-[240px_1fr]">
           <img
-            src={GK47_QUOTE.photo}
+            src={pub(GK47_QUOTE.photo)}
             alt={GK47_QUOTE.author}
             className="mx-auto w-48 rounded-xl object-cover shadow md:w-full"
             loading="lazy"
@@ -114,7 +115,7 @@ export default function HeroesTeam() {
             </ul>
           </div>
           <img
-            src="/gk47-program.jpg"
+            src={pub('/gk47-program.jpg')}
             alt="Зал заседаний Правительства Ленинградской области"
             className="w-full rounded-xl object-cover shadow-sm"
             loading="lazy"
@@ -193,7 +194,7 @@ export default function HeroesTeam() {
           {GK47_COUNCIL_HEADS.map((p) => (
             <div key={p.name} className="rounded-xl border bg-white p-5 text-center shadow-sm">
               <img
-                src={p.photo}
+                src={pub(p.photo)}
                 alt={p.name}
                 className="mx-auto h-28 w-28 rounded-full object-cover shadow"
                 loading="lazy"

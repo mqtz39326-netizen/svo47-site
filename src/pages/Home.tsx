@@ -10,6 +10,7 @@ import HeroStories from '@/components/HeroStories'
 import { HOTLINE, HOTLINE_TEL } from '@/components/Layout'
 import { CATEGORIES, MEASURES, SRC_GEROI, SRC_LENOBL, SRC_MFC } from '@/data/measures'
 import { CATEGORY_ICONS } from '@/components/categoryIcons'
+import { pub } from '@/lib/utils'
 
 export default function Home() {
   const { status } = useStatus()
@@ -20,7 +21,7 @@ export default function Home() {
       {/* Приветственный блок */}
       <section className="relative overflow-hidden bg-[#3d4a22] text-white">
         <img
-          src="/hero-bg.jpg"
+          src={pub('/hero-bg.jpg')}
           alt=""
           aria-hidden
           className="absolute inset-0 h-full w-full object-cover"
@@ -140,7 +141,7 @@ export default function Home() {
             className="aspect-video w-full bg-[#232a17]"
             aria-label="Видеообращение рядового Анисимова Максима Юрьевича"
           >
-            <source src="/anisimov-video.mp4" type="video/mp4" />
+            <source src={pub('/anisimov-video.mp4')} type="video/mp4" />
             Ваш браузер не поддерживает воспроизведение видео.
           </video>
           <figcaption className="p-4">

@@ -37,6 +37,7 @@ import {
   MC_SOURCE,
   MC_WHO_CAN,
 } from '@/data/multicenter'
+import { pub } from '@/lib/utils'
 
 export default function Multicenter() {
   return (
@@ -85,7 +86,7 @@ export default function Multicenter() {
           </div>
           <div className="space-y-4">
             <img
-              src="/mc-cafk.jpg"
+              src={pub('/mc-cafk.jpg')}
               alt="Здание Центра адаптивной физической культуры Мультицентра"
               className="w-full rounded-xl object-cover shadow-sm"
               loading="lazy"
@@ -121,7 +122,7 @@ export default function Multicenter() {
             >
               {f.photo && (
                 <img
-                  src={f.photo}
+                  src={pub(f.photo)}
                   alt={f.name}
                   className="aspect-[2/1] w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                   loading="lazy"
@@ -174,7 +175,7 @@ export default function Multicenter() {
               className="group flex flex-col overflow-hidden rounded-xl border bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#6f5c17]/40 hover:shadow-md"
             >
               <img
-                src={p.photo}
+                src={pub(p.photo)}
                 alt={p.name}
                 className="aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                 loading="lazy"

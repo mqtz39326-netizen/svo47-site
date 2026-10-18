@@ -1,6 +1,7 @@
 // Отдельная страница конкурса «Мой Герой СВО 47».
 // Источник: msu.lenobl.ru (Комитет по местному самоуправлению ЛО).
 import { Link } from 'react-router'
+import { pub } from '@/lib/utils'
 import {
   Trophy,
   Newspaper,
@@ -69,7 +70,7 @@ export default function Contest() {
       {/* Шапка страницы */}
       <section className="relative overflow-hidden bg-[#3d4a22] text-white print:hidden">
         <img
-          src="/hero-bg.jpg"
+          src={pub('/hero-bg.jpg')}
           alt=""
           aria-hidden
           className="absolute inset-0 h-full w-full object-cover"

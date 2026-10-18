@@ -12,6 +12,7 @@ import {
   type CarouselApi,
 } from '@/components/ui/carousel'
 import { HERO_STORIES, STORIES_SOURCE, STORIES_SOURCE_2 } from '@/data/stories'
+import { pub } from '@/lib/utils'
 
 export default function HeroStories() {
   const [api, setApi] = useState<CarouselApi>()
@@ -45,7 +46,7 @@ export default function HeroStories() {
                     <div className="grid md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
                       <div className="relative min-h-56 md:min-h-[22rem]">
                         <img
-                          src={s.photo}
+                          src={pub(s.photo)}
                           alt={s.photoAlt ?? ''}
                           className="absolute inset-0 h-full w-full object-cover"
                           loading="lazy"
