@@ -1,0 +1,177 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.625rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-size: 16px;
+  }
+}
+
+/* ==========================================================
+   Милитари-стиль: диагональная лента, трафаретные заголовки
+   ========================================================== */
+.military-stripes {
+  height: 8px;
+  background: repeating-linear-gradient(
+    -45deg,
+    #3d4a22 0,
+    #3d4a22 16px,
+    #b7a45a 16px,
+    #b7a45a 32px
+  );
+}
+
+.stencil-heading {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ==========================================================
+   Версия для слабовидящих (ГОСТ Р 52872-2019)
+   ========================================================== */
+html.a11y-large body {
+  font-size: 19px;
+}
+html.a11y-xl body {
+  font-size: 22px;
+}
+html.a11y-large,
+html.a11y-xl {
+  line-height: 1.6;
+}
+
+/* Контрастная схема: переопределяем CSS-переменные темы */
+html.a11y-contrast {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 0%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 0%;
+  --primary: 0 0% 0%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 92%;
+  --secondary-foreground: 0 0% 0%;
+  --muted: 0 0% 92%;
+  --muted-foreground: 0 0% 15%;
+  --accent: 0 0% 92%;
+  --accent-foreground: 0 0% 0%;
+  --border: 0 0% 0%;
+  --input: 0 0% 0%;
+  --ring: 0 0% 0%;
+}
+html.a11y-contrast body,
+html.a11y-contrast header,
+html.a11y-contrast footer,
+html.a11y-contrast section,
+html.a11y-contrast div,
+html.a11y-contrast a,
+html.a11y-contrast span,
+html.a11y-contrast p,
+html.a11y-contrast h1,
+html.a11y-contrast h2,
+html.a11y-contrast h3,
+html.a11y-contrast button {
+  background-color: #fff;
+  color: #000;
+  border-color: #000;
+}
+html.a11y-contrast a {
+  text-decoration: underline;
+}
+html.a11y-contrast * {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  background-image: none !important;
+}
+
+/* Отключение изображений */
+html.a11y-noimg img,
+html.a11y-noimg iframe {
+  display: none !important;
+}
+
+/* ==========================================================
+   Печать карточки меры
+   ========================================================== */
+@media print {
+  body {
+    background: #fff;
+    font-size: 12pt;
+  }
+  article {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+  article .shadow-sm {
+    box-shadow: none !important;
+  }
+}
