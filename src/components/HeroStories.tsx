@@ -44,11 +44,11 @@ export default function HeroStories() {
                 <article className="overflow-hidden rounded-xl bg-white shadow-md">
                   {s.photo ? (
                     <div className="grid md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-                      <div className="relative min-h-56 md:min-h-[22rem]">
+                      <div className="relative min-h-56 bg-[#232a17] md:min-h-[22rem]">
                         <img
                           src={pub(s.photo)}
                           alt={s.photoAlt ?? ''}
-                          className="absolute inset-0 h-full w-full object-cover"
+                          className="absolute inset-0 h-full w-full object-contain"
                           loading="lazy"
                         />
                       </div>
