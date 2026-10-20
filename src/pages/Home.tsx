@@ -1,9 +1,7 @@
-// Главная страница: приветствие, селектор помощи, каталог мер с фильтрами
-// (как в каталоге Госуслуг), карусель историй, видео, горячая линия, источники.
+// Главная страница: приветствие, баннер конкурса, карусель историй,
+// видео, горячая линия, источники.
 import { Link } from 'react-router'
 import { ArrowRight, ExternalLink, Phone, Trophy } from 'lucide-react'
-import HelpQuiz from '@/components/HelpQuiz'
-import MeasuresCatalog from '@/components/MeasuresCatalog'
 import HeroStories from '@/components/HeroStories'
 import { HOTLINE, HOTLINE_TEL } from '@/components/Layout'
 import { SRC_GEROI, SRC_LENOBL, SRC_MFC } from '@/data/measures'
@@ -36,11 +34,6 @@ export default function Home() {
         <div className="military-stripes" aria-hidden />
       </section>
 
-      {/* Селектор помощи (квиз) */}
-      <section className="mx-auto max-w-6xl px-4 pt-8">
-        <HelpQuiz />
-      </section>
-
       {/* Баннер конкурса */}
       <section className="mx-auto max-w-6xl px-4 pt-8">
         <Link
@@ -61,9 +54,6 @@ export default function Home() {
           </span>
         </Link>
       </section>
-
-      {/* Каталог мер с фильтрами (как в каталоге Госуслуг) */}
-      <MeasuresCatalog />
 
       {/* Слово героям СВО: карусель историй */}
       <div className="mt-12">

@@ -8,11 +8,11 @@ import { cn } from '@/lib/utils'
 
 const NAV = [
   { to: '/', label: 'Главная', end: true },
-  { to: '/places', label: 'Где получить' },
   { to: '/contest', label: 'Конкурс «Мой Герой СВО 47»' },
   { to: '/heroes-team', label: 'Герои команды 47' },
   { to: '/multicenter', label: 'Мультицентр' },
   { to: '/faq', label: 'Вопросы и ответы' },
+  { to: '/places', label: 'Где получить' },
   { to: '/links', label: 'Полезные ссылки' },
 ]
 
