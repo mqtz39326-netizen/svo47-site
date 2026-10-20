@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils'
 
 const NAV = [
   { to: '/', label: 'Главная', end: true },
-  { to: '/catalog', label: 'Каталог мер' },
   { to: '/places', label: 'Где получить' },
   { to: '/contest', label: 'Конкурс «Мой Герой СВО 47»' },
   { to: '/heroes-team', label: 'Герои команды 47' },
@@ -69,7 +68,7 @@ export default function Layout() {
               Присоединиться!
             </a>
             <Link
-              to="/catalog"
+              to="/"
               className="stencil-heading flex h-11 items-center whitespace-nowrap rounded-md bg-black/60 px-3.5 text-[11px] font-bold tracking-wide text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-black/80 hover:shadow"
             >
               Меры поддержки СВО

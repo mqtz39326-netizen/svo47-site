@@ -1,21 +1,15 @@
-// Главная страница: приветствие, поиск, плитки категорий,
-// переключатель статуса, селектор помощи, горячая линия, источники.
+// Главная страница: приветствие, селектор помощи, каталог мер с фильтрами
+// (как в каталоге Госуслуг), карусель историй, видео, горячая линия, источники.
 import { Link } from 'react-router'
 import { ArrowRight, ExternalLink, Phone, Trophy } from 'lucide-react'
-import SearchBar from '@/components/SearchBar'
 import HelpQuiz from '@/components/HelpQuiz'
-import { StatusSwitcher, useStatus } from '@/components/StatusSwitcher'
-import MeasureCard from '@/components/MeasureCard'
+import MeasuresCatalog from '@/components/MeasuresCatalog'
 import HeroStories from '@/components/HeroStories'
 import { HOTLINE, HOTLINE_TEL } from '@/components/Layout'
-import { CATEGORIES, MEASURES, SRC_GEROI, SRC_LENOBL, SRC_MFC } from '@/data/measures'
-import { CATEGORY_ICONS } from '@/components/categoryIcons'
+import { SRC_GEROI, SRC_LENOBL, SRC_MFC } from '@/data/measures'
 import { pub } from '@/lib/utils'
 
 export default function Home() {
-  const { status } = useStatus()
-  const personal = status ? MEASURES.filter((m) => m.recipients.includes(status)) : []
-
   return (
     <>
       {/* Приветственный блок */}
@@ -38,13 +32,6 @@ export default function Home() {
             Единая точка входа: найдите положенные вам меры поддержки и понятную инструкцию,
             как их получить, — за 2–3 клика.
           </p>
-          <div className="mt-6 max-w-2xl">
-            <SearchBar large />
-          </div>
-          <div className="mt-6">
-            <p className="mb-2 text-sm text-[#cfc99d]">Выберите ваш статус — покажем подходящие меры:</p>
-            <StatusSwitcher />
-          </div>
         </div>
         <div className="military-stripes" aria-hidden />
       </section>
@@ -75,56 +62,8 @@ export default function Home() {
         </Link>
       </section>
 
-      {/* Персональная подборка по статусу */}
-      {status && personal.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 pt-10" aria-live="polite">
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <h2 className="text-xl font-bold text-[#3d4a22] sm:text-2xl">
-              Подходящие вам меры ({personal.length})
-            </h2>
-            <Link
-              to="/catalog"
-              className="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-[#3d4a22] hover:underline"
-            >
-              Весь каталог <ArrowRight className="h-4 w-4" aria-hidden />
-            </Link>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {personal.slice(0, 6).map((m) => (
-              <MeasureCard key={m.id} measure={m} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Плитки-навигаторы по категориям */}
-      <section className="mx-auto max-w-6xl px-4 pt-12">
-        <h2 className="mb-6 text-xl font-bold text-[#3d4a22] sm:text-2xl">Категории мер поддержки</h2>
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-          {CATEGORIES.map((c) => {
-            const Icon = CATEGORY_ICONS[c.id]
-            const count = MEASURES.filter((m) => m.category === c.id).length
-            return (
-              <Link
-                key={c.id}
-                to={`/catalog?category=${c.id}`}
-                className="group flex flex-col rounded-xl border bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#3d4a22] hover:shadow-md sm:p-5"
-              >
-                <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-[#3d4a22]/5 text-[#3d4a22] transition-colors group-hover:bg-[#3d4a22] group-hover:text-white">
-                  <Icon className="h-6 w-6" aria-hidden />
-                </span>
-                <span className="text-sm font-semibold leading-snug text-slate-900 sm:text-base">
-                  {c.title}
-                </span>
-                <span className="mt-1 hidden text-xs text-muted-foreground sm:block">{c.description}</span>
-                <span className="mt-2 text-xs font-medium text-[#6f5c17]">
-                  {count} {plural(count, 'мера', 'меры', 'мер')}
-                </span>
-              </Link>
-            )
-          })}
-        </div>
-      </section>
+      {/* Каталог мер с фильтрами (как в каталоге Госуслуг) */}
+      <MeasuresCatalog />
 
       {/* Слово героям СВО: карусель историй */}
       <div className="mt-12">
@@ -207,12 +146,4 @@ export default function Home() {
       </section>
     </>
   )
-}
-
-function plural(n: number, one: string, few: string, many: string): string {
-  const mod10 = n % 10
-  const mod100 = n % 100
-  if (mod10 === 1 && mod100 !== 11) return one
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few
-  return many
 }

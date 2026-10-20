@@ -1,8 +1,8 @@
-// Каталог мер поддержки. Система фильтров повторяет каталог Госуслуг
-// «Меры поддержки для защитников Отечества» (https://www.gosuslugi.ru/fzo):
-// чипы получателей, мультивыбор «Направление», список «Тип меры».
-// Разметка мер по этой таксономии — в src/data/gosfilters.ts.
-import { useMemo, useState } from 'react'
+// Раздел «Меры поддержки для жителей Ленинградской области» на главной странице.
+// Система фильтров повторяет каталог Госуслуг «Меры поддержки для защитников
+// Отечества» (https://www.gosuslugi.ru/fzo): чипы получателей, мультивыбор
+// «Направление», список «Тип меры». Разметка мер — в src/data/gosfilters.ts.
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { ChevronDown, SlidersHorizontal, X } from 'lucide-react'
 import MeasureCard from '@/components/MeasureCard'
@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/select'
 import { MEASURES } from '@/data/measures'
 import {
-  GOS_CATEGORY_TO_DIRECTIONS,
   GOS_DIRECTIONS,
   GOS_GROUPS,
   GOS_LEVELS,
@@ -28,26 +27,34 @@ import {
   type GosGroup,
   type GosLevel,
 } from '@/data/gosfilters'
-import { searchMeasures } from '@/components/SearchBar'
 import { cn } from '@/lib/utils'
+
+/** Поиск мер по названию, описанию и ведомству */
+function searchMeasures(query: string) {
+  const q = query.trim().toLowerCase()
+  if (!q) return []
+  return MEASURES.filter(
+    (m) =>
+      m.title.toLowerCase().includes(q) ||
+      m.short.toLowerCase().includes(q) ||
+      m.department.toLowerCase().includes(q),
+  )
+}
 
 type SortMode = 'alpha' | 'amount-desc' | 'amount-asc'
 
-export default function Catalog() {
+export default function MeasuresCatalog() {
   const [params] = useSearchParams()
+  const paramQ = params.get('q') ?? ''
 
-  // Старые ссылки /catalog?category=<id> (плитки главной, хлебные крошки)
-  // переводим в предвыбранные направления Госуслуг.
-  const categoryParam = params.get('category')
-  const initialDirections = categoryParam
-    ? (GOS_CATEGORY_TO_DIRECTIONS[categoryParam] ?? [])
-    : []
-
-  const [query, setQuery] = useState(params.get('q') ?? '')
+  const [query, setQuery] = useState(paramQ)
   const [group, setGroup] = useState<GosGroup | 'all'>('all')
-  const [directions, setDirections] = useState<GosDirection[]>(initialDirections)
+  const [directions, setDirections] = useState<GosDirection[]>([])
   const [level, setLevel] = useState<GosLevel | 'all'>('all')
   const [sort, setSort] = useState<SortMode>('alpha')
+
+  // Поиск из строки адреса (?q=…), например после отправки формы поиска
+  useEffect(() => setQuery(paramQ), [paramQ])
 
   const toggleDirection = (d: GosDirection) =>
     setDirections((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]))
@@ -84,21 +91,14 @@ export default function Catalog() {
     setSort('alpha')
   }
 
-  const hasFilters =
-    query || group !== 'all' || directions.length > 0 || level !== 'all'
+  const hasFilters = query || group !== 'all' || directions.length > 0 || level !== 'all'
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <nav aria-label="Хлебные крошки" className="mb-4 text-sm text-muted-foreground">
-        <a href="#/" className="hover:underline">Главная</a>
-        <span aria-hidden> / </span>
-        <span aria-current="page">Каталог мер</span>
-      </nav>
-
-      <h1 className="mb-2 text-2xl font-bold text-[#3d4a22] sm:text-3xl">
+    <section id="measures" className="mx-auto max-w-6xl px-4 pt-12">
+      <h2 className="mb-2 text-xl font-bold text-[#3d4a22] sm:text-2xl">
         Меры поддержки для жителей Ленинградской области
-      </h1>
-      <p className="mb-6 max-w-2xl text-muted-foreground">
+      </h2>
+      <p className="mb-6 text-sm text-muted-foreground">
         Найдено: {filtered.length} из {MEASURES.length}.
       </p>
 
@@ -142,13 +142,13 @@ export default function Catalog() {
           ))}
         </div>
 
-        {/* Направление и тип меры */}
+        {/* Поиск, направление и тип меры */}
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Поиск по названию и описанию…"
-            aria-label="Поиск по каталогу"
+            aria-label="Поиск по мерам поддержки"
             className="lg:col-span-2"
           />
           <Popover>
@@ -170,22 +170,19 @@ export default function Catalog() {
             </PopoverTrigger>
             <PopoverContent className="w-80 p-2" align="start">
               <ul className="max-h-72 overflow-y-auto">
-                {GOS_DIRECTIONS.map((d) => {
-                  const checked = directions.includes(d.id)
-                  return (
-                    <li key={d.id}>
-                      <label className="flex cursor-pointer items-start gap-2.5 rounded-md px-2 py-2 text-sm hover:bg-accent">
-                        <Checkbox
-                          checked={checked}
-                          onCheckedChange={() => toggleDirection(d.id)}
-                          className="mt-0.5"
-                          aria-label={d.label}
-                        />
-                        <span>{d.label}</span>
-                      </label>
-                    </li>
-                  )
-                })}
+                {GOS_DIRECTIONS.map((d) => (
+                  <li key={d.id}>
+                    <label className="flex cursor-pointer items-start gap-2.5 rounded-md px-2 py-2 text-sm hover:bg-accent">
+                      <Checkbox
+                        checked={directions.includes(d.id)}
+                        onCheckedChange={() => toggleDirection(d.id)}
+                        className="mt-0.5"
+                        aria-label={d.label}
+                      />
+                      <span>{d.label}</span>
+                    </label>
+                  </li>
+                ))}
               </ul>
             </PopoverContent>
           </Popover>
@@ -243,6 +240,6 @@ export default function Catalog() {
           </p>
         </div>
       )}
-    </div>
+    </section>
   )
 }

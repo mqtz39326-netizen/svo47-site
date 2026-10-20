@@ -38,9 +38,9 @@ export default function MeasureDetail() {
       <div className="mx-auto max-w-3xl px-4 py-16 text-center">
         <h1 className="text-2xl font-bold">Мера не найдена</h1>
         <p className="mt-3 text-muted-foreground">
-          Возможно, страница была перемещена. Перейдите в{' '}
-          <Link to="/catalog" className="text-[#3d4a22] underline">
-            каталог мер
+          Возможно, страница была перемещена. Перейдите к{' '}
+          <Link to="/" className="text-[#3d4a22] underline">
+            списку мер на главной странице
           </Link>
           .
         </p>
@@ -75,11 +75,7 @@ export default function MeasureDetail() {
       <nav aria-label="Хлебные крошки" className="mb-4 text-sm text-muted-foreground print:hidden">
         <Link to="/" className="hover:underline">Главная</Link>
         <span aria-hidden> / </span>
-        <Link to="/catalog" className="hover:underline">Каталог мер</Link>
-        <span aria-hidden> / </span>
-        <Link to={`/catalog?category=${measure.category}`} className="hover:underline">
-          {category?.title}
-        </Link>
+        <span aria-current="page">{category?.title}</span>
       </nav>
 
       {/* Заголовок */}
