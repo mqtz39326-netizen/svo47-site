@@ -1,11 +1,15 @@
-// Каталог мер поддержки: карточки, фильтры (категория, статус, ведомство),
-// поиск, сортировка (алфавит / размер выплаты).
+// Каталог мер поддержки. Система фильтров повторяет каталог Госуслуг
+// «Меры поддержки для защитников Отечества» (https://www.gosuslugi.ru/fzo):
+// чипы получателей, мультивыбор «Направление», список «Тип меры».
+// Разметка мер по этой таксономии — в src/data/gosfilters.ts.
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router'
-import { SlidersHorizontal, X } from 'lucide-react'
+import { ChevronDown, SlidersHorizontal, X } from 'lucide-react'
 import MeasureCard from '@/components/MeasureCard'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Select,
   SelectContent,
@@ -13,22 +17,40 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { CATEGORIES, DEPARTMENTS, MEASURES, RECIPIENT_LABELS } from '@/data/measures'
-import type { CategoryId, Recipient } from '@/data/types'
+import { MEASURES } from '@/data/measures'
+import {
+  GOS_CATEGORY_TO_DIRECTIONS,
+  GOS_DIRECTIONS,
+  GOS_GROUPS,
+  GOS_LEVELS,
+  gosTags,
+  type GosDirection,
+  type GosGroup,
+  type GosLevel,
+} from '@/data/gosfilters'
 import { searchMeasures } from '@/components/SearchBar'
-import { useStatus } from '@/components/StatusSwitcher'
+import { cn } from '@/lib/utils'
 
 type SortMode = 'alpha' | 'amount-desc' | 'amount-asc'
 
 export default function Catalog() {
-  const [params, setParams] = useSearchParams()
-  const { status } = useStatus()
+  const [params] = useSearchParams()
 
-  const category = (params.get('category') ?? 'all') as CategoryId | 'all'
+  // Старые ссылки /catalog?category=<id> (плитки главной, хлебные крошки)
+  // переводим в предвыбранные направления Госуслуг.
+  const categoryParam = params.get('category')
+  const initialDirections = categoryParam
+    ? (GOS_CATEGORY_TO_DIRECTIONS[categoryParam] ?? [])
+    : []
+
   const [query, setQuery] = useState(params.get('q') ?? '')
-  const [recipient, setRecipient] = useState<Recipient | 'all'>(status ?? 'all')
-  const [department, setDepartment] = useState<string>('all')
+  const [group, setGroup] = useState<GosGroup | 'all'>('all')
+  const [directions, setDirections] = useState<GosDirection[]>(initialDirections)
+  const [level, setLevel] = useState<GosLevel | 'all'>('all')
   const [sort, setSort] = useState<SortMode>('alpha')
+
+  const toggleDirection = (d: GosDirection) =>
+    setDirections((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]))
 
   const filtered = useMemo(() => {
     let list = [...MEASURES]
@@ -36,9 +58,10 @@ export default function Catalog() {
       const found = new Set(searchMeasures(query).map((m) => m.id))
       list = list.filter((m) => found.has(m.id))
     }
-    if (category !== 'all') list = list.filter((m) => m.category === category)
-    if (recipient !== 'all') list = list.filter((m) => m.recipients.includes(recipient))
-    if (department !== 'all') list = list.filter((m) => m.department === department)
+    if (group !== 'all') list = list.filter((m) => gosTags(m.id).groups.includes(group))
+    if (directions.length > 0)
+      list = list.filter((m) => gosTags(m.id).directions.some((d) => directions.includes(d)))
+    if (level !== 'all') list = list.filter((m) => gosTags(m.id).level === level)
     switch (sort) {
       case 'alpha':
         list.sort((a, b) => a.title.localeCompare(b.title, 'ru'))
@@ -51,17 +74,18 @@ export default function Catalog() {
         break
     }
     return list
-  }, [query, category, recipient, department, sort])
+  }, [query, group, directions, level, sort])
 
   const resetFilters = () => {
     setQuery('')
-    setRecipient('all')
-    setDepartment('all')
+    setGroup('all')
+    setDirections([])
+    setLevel('all')
     setSort('alpha')
-    setParams({})
   }
 
-  const hasFilters = query || category !== 'all' || recipient !== 'all' || department !== 'all'
+  const hasFilters =
+    query || group !== 'all' || directions.length > 0 || level !== 'all'
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -71,19 +95,55 @@ export default function Catalog() {
         <span aria-current="page">Каталог мер</span>
       </nav>
 
-      <h1 className="mb-2 text-2xl font-bold text-[#3d4a22] sm:text-3xl">Каталог мер поддержки</h1>
+      <h1 className="mb-2 text-2xl font-bold text-[#3d4a22] sm:text-3xl">
+        Меры поддержки для жителей Ленинградской области
+      </h1>
       <p className="mb-6 max-w-2xl text-muted-foreground">
-        Все меры социальной поддержки участников СВО и членов их семей, действующие в Ленинградской области.
         Найдено: {filtered.length} из {MEASURES.length}.
       </p>
 
-      {/* Панель фильтров */}
+      {/* Панель фильтров — как в каталоге Госуслуг */}
       <div className="mb-6 rounded-xl border bg-white p-4 shadow-sm">
         <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-700">
           <SlidersHorizontal className="h-4 w-4" aria-hidden />
-          Поиск и фильтры
+          Фильтры
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+
+        {/* Получатели — чипы */}
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Кому положено">
+          <button
+            type="button"
+            onClick={() => setGroup('all')}
+            aria-pressed={group === 'all'}
+            className={cn(
+              'rounded-full border px-4 py-1.5 text-sm font-medium transition-colors',
+              group === 'all'
+                ? 'border-[#3d4a22] bg-[#3d4a22] text-white'
+                : 'border-slate-300 bg-white text-slate-700 hover:border-[#3d4a22]/50',
+            )}
+          >
+            Все
+          </button>
+          {GOS_GROUPS.map((g) => (
+            <button
+              key={g.id}
+              type="button"
+              onClick={() => setGroup(g.id)}
+              aria-pressed={group === g.id}
+              className={cn(
+                'rounded-full border px-4 py-1.5 text-sm font-medium transition-colors',
+                group === g.id
+                  ? 'border-[#3d4a22] bg-[#3d4a22] text-white'
+                  : 'border-slate-300 bg-white text-slate-700 hover:border-[#3d4a22]/50',
+              )}
+            >
+              {g.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Направление и тип меры */}
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -91,49 +151,59 @@ export default function Catalog() {
             aria-label="Поиск по каталогу"
             className="lg:col-span-2"
           />
-          <Select
-            value={category}
-            onValueChange={(v) => setParams(v === 'all' ? {} : { category: v })}
-          >
-            <SelectTrigger aria-label="Категория">
-              <SelectValue placeholder="Категория" />
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground"
+                aria-label="Направление"
+              >
+                <span className={cn('truncate', directions.length === 0 && 'text-muted-foreground')}>
+                  {directions.length === 0
+                    ? 'Направление'
+                    : directions.length === 1
+                      ? GOS_DIRECTIONS.find((d) => d.id === directions[0])?.label
+                      : `Выбрано ${directions.length} знач.`}
+                </span>
+                <ChevronDown className="h-4 w-4 shrink-0 opacity-50" aria-hidden />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-2" align="start">
+              <ul className="max-h-72 overflow-y-auto">
+                {GOS_DIRECTIONS.map((d) => {
+                  const checked = directions.includes(d.id)
+                  return (
+                    <li key={d.id}>
+                      <label className="flex cursor-pointer items-start gap-2.5 rounded-md px-2 py-2 text-sm hover:bg-accent">
+                        <Checkbox
+                          checked={checked}
+                          onCheckedChange={() => toggleDirection(d.id)}
+                          className="mt-0.5"
+                          aria-label={d.label}
+                        />
+                        <span>{d.label}</span>
+                      </label>
+                    </li>
+                  )
+                })}
+              </ul>
+            </PopoverContent>
+          </Popover>
+          <Select value={level} onValueChange={(v) => setLevel(v as GosLevel | 'all')}>
+            <SelectTrigger aria-label="Тип меры">
+              <SelectValue placeholder="Тип меры" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Все категории</SelectItem>
-              {CATEGORIES.map((c) => (
-                <SelectItem key={c.id} value={c.id}>
-                  {c.title}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={recipient} onValueChange={(v) => setRecipient(v as Recipient | 'all')}>
-            <SelectTrigger aria-label="Кому положено">
-              <SelectValue placeholder="Кому положено" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Все получатели</SelectItem>
-              {(Object.keys(RECIPIENT_LABELS) as Recipient[]).map((r) => (
-                <SelectItem key={r} value={r}>
-                  {RECIPIENT_LABELS[r]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={department} onValueChange={setDepartment}>
-            <SelectTrigger aria-label="Ведомство">
-              <SelectValue placeholder="Ведомство" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Все ведомства</SelectItem>
-              {DEPARTMENTS.map((d) => (
-                <SelectItem key={d} value={d}>
-                  {d}
+              <SelectItem value="all">Все</SelectItem>
+              {GOS_LEVELS.map((l) => (
+                <SelectItem key={l.id} value={l.id}>
+                  {l.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
+
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <Select value={sort} onValueChange={(v) => setSort(v as SortMode)}>
             <SelectTrigger className="w-56" aria-label="Сортировка">
