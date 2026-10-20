@@ -2,10 +2,10 @@
 // Система фильтров повторяет каталог Госуслуг «Меры поддержки для защитников
 // Отечества» (https://www.gosuslugi.ru/fzo): чипы получателей, мультивыбор
 // «Направление», список «Тип меры». Разметка мер — в src/data/gosfilters.ts.
+// Карточки мер не выводятся — только панель фильтров со счётчиком найденного.
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { ChevronDown, SlidersHorizontal, X } from 'lucide-react'
-import MeasureCard from '@/components/MeasureCard'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -220,26 +220,6 @@ export default function MeasuresCatalog() {
           )}
         </div>
       </div>
-
-      {/* Результаты */}
-      {filtered.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((m) => (
-            <MeasureCard key={m.id} measure={m} />
-          ))}
-        </div>
-      ) : (
-        <div className="rounded-xl border bg-white p-10 text-center">
-          <p className="text-lg font-medium">По вашему запросу ничего не найдено</p>
-          <p className="mt-2 text-muted-foreground">
-            Попробуйте изменить условия поиска или позвоните на горячую линию{' '}
-            <a href="tel:88003500605" className="font-semibold text-[#6f5c17] hover:underline">
-              8 (800) 350-06-05
-            </a>
-            .
-          </p>
-        </div>
-      )}
     </section>
   )
 }
