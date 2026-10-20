@@ -1,7 +1,8 @@
-// Главная страница: приветствие, баннер конкурса, карусель историй,
-// видео, горячая линия, источники.
+// Главная страница: приветствие, баннер конкурса, каталог мер с фильтрами,
+// карусель историй, видео, горячая линия, источники.
 import { Link } from 'react-router'
 import { ArrowRight, ExternalLink, Phone, Trophy } from 'lucide-react'
+import MeasuresCatalog from '@/components/MeasuresCatalog'
 import HeroStories from '@/components/HeroStories'
 import { HOTLINE, HOTLINE_TEL } from '@/components/Layout'
 import { SRC_GEROI, SRC_LENOBL, SRC_MFC } from '@/data/measures'
@@ -54,6 +55,9 @@ export default function Home() {
           </span>
         </Link>
       </section>
+
+      {/* Каталог мер с фильтрами (как в каталоге Госуслуг) */}
+      <MeasuresCatalog />
 
       {/* Слово героям СВО: карусель историй */}
       <div className="mt-12">
